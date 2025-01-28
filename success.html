@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thank You</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    }
+
+    /* Additional styles for animation */
+    .visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <h2 id="thankYouMessage">Thanks for trying this Project. you can verify data in DynamoDB Table.</h2>
+
+  <!-- Simple JavaScript for animation -->
+  <script>
+    const thankYouMessage = document.getElementById('thankYouMessage');
+
+    // Adding a delay before showing the message
+    setTimeout(() => {
+      thankYouMessage.classList.add('visible');
+    }, 500);
+  </script>
+
+</body>
+</html>
