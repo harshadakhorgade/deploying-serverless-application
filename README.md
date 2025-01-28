@@ -171,3 +171,81 @@ API Gateway serves as the entry point for your application, exposing HTTP endpoi
    - Check the Lambda function logs in **CloudWatch Logs** for debugging.
 
 ---
+
+
+
+
+### **Explanation of the Lambda Function Code**
+
+This code implements an AWS Lambda function that handles HTTP requests (via API Gateway) to either display an HTML form (GET request) or store form data into DynamoDB (POST request). Below is a breakdown of the code:
+
+---
+
+### **Imports:**
+- **json**: Used for encoding and decoding JSON data.
+- **os**: Not used in the code but can be used to interact with the operating system (e.g., to access environment variables).
+- **boto3**: The AWS SDK for Python, used to interact with AWS services, in this case, DynamoDB.
+- **urllib.parse**: Provides functions for parsing URL-encoded data, especially useful for form submissions.
+
+---
+
+### **`lambda_handler` Function**
+This is the entry point for the Lambda function. It receives the `event` and `context` as parameters:
+- `event`: Contains information about the incoming request, such as HTTP method, query parameters, and body.
+- `context`: Provides runtime information about the Lambda function (not used here).
+
+#### **Function Flow:**
+1. **Error Handling**: The function uses a `try-except` block to catch and return any errors that may occur during processing.
+2. **Routing the Request**: The `page_router` function is called to route the request based on the HTTP method (`GET` or `POST`).
+
+---
+
+### **`page_router` Function**
+This function routes the request based on the HTTP method provided in the event object:
+1. **GET Request**:
+   - Reads the `contactus.html` file (the contact form) from the local file system.
+   - Returns the HTML content as the response with a `200 OK` status.
+   
+2. **POST Request**:
+   - Calls the `insert_record` function to save the submitted form data into DynamoDB.
+   - Reads the `success.html` file (a success page) from the local file system.
+   - Returns the HTML content as the response with a `200 OK` status.
+   
+   **Error Handling**: If an error occurs in either case, a `500 Internal Server Error` response is returned with the error message.
+
+---
+
+### **`insert_record` Function**
+This function handles the insertion of the form data into DynamoDB:
+1. **Form Body Decoding**:
+   - If the `formbody` is URL-encoded (common with form submissions), it is decoded into a dictionary.
+   - If the form data is a JSON string, it is parsed into a dictionary.
+   
+2. **DynamoDB Client**: 
+   - The `boto3` client for DynamoDB is used to interact with the DynamoDB service.
+   
+3. **Inserting Data**:
+   - The function inserts the form data (`fname`, `lname`, `email`, and `message`) into the `mydata` table in DynamoDB using the `put_item` API.
+   
+4. **Response**: 
+   - After inserting the data, the function returns the DynamoDB response.
+
+---
+
+### **Workflow Summary:**
+1. **GET Request**: When the client sends a `GET` request, the Lambda function returns the HTML form (`contactus.html`).
+2. **POST Request**: When the client submits the form via a `POST` request, the Lambda function:
+   - Decodes and processes the form data.
+   - Inserts the data into DynamoDB.
+   - Returns a success page (`success.html`).
+
+---
+
+### **Important Notes**:
+- **DynamoDB Table**: The code assumes that a DynamoDB table named `mydata` exists with the necessary schema to store the form data. Ensure the table exists before running this function.
+- **Error Handling**: The Lambda function is designed to return a `500 Internal Server Error` if any exceptions occur while reading files, processing requests, or interacting with DynamoDB.
+- **Local Files**: The HTML files (`contactus.html` and `success.html`) must be available in the Lambda environment, but AWS Lambda typically does not allow direct access to the file system. In practice, you might want to use an S3 bucket to store these HTML files and read them from there instead.
+
+---
+
+This code can be deployed as a serverless application in AWS, where the API Gateway triggers the Lambda function, and DynamoDB is used to store the data from the form submission.
