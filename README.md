@@ -1,5 +1,3 @@
-# deploying-serverless-application
-
 
 ---
 
